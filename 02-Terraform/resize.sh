@@ -13,6 +13,11 @@ INSTANCEID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 # Get the ID of the Amazon EBS volume associated with the instance.
 VOLUMEID=$(aws ec2 describe-instances --instance-ids $INSTANCEID --query "Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId" --output text)
 
+if [ -z "$VOLUMEID" ]; then
+  echo "Error: Unable to retrieve the volume ID."
+  exit 1
+fi
+
 # Resize the EBS volume.
 aws ec2 modify-volume --volume-id $VOLUMEID --size $SIZE
 
@@ -20,10 +25,15 @@ aws ec2 modify-volume --volume-id $VOLUMEID --size $SIZE
 echo "Waiting for volume modification to complete..."
 while true; do
     STATUS=$(aws ec2 describe-volumes-modifications --volume-id $VOLUMEID --query "VolumesModifications[0].ModificationState" --output text)
+    
     if [ "$STATUS" == "completed" ] || [ "$STATUS" == "optimizing" ]; then
         echo "Volume modification completed."
         break
+    elif [ -z "$STATUS" ]; then
+        echo "Error: Unable to retrieve the modification status."
+        exit 1
     fi
+    
     echo "Waiting for volume to be resized..."
     sleep 5
 done
