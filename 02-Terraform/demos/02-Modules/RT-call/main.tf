@@ -1,4 +1,0 @@
-module "routetable" {
-  source = "../RouteTables"
-  
-}

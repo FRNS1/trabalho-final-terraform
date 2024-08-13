@@ -1,4 +1,0 @@
-awscli
-checkov
-boto3
-botocore

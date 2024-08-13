@@ -15,9 +15,17 @@ variable "aws_amis" {
 variable "KEY_NAME" {
   default = "vockey"
 }
+
 variable "PATH_TO_KEY" {
   default = "/home/ubuntu/.ssh/vockey.pem"
 }
+
 variable "INSTANCE_USERNAME" {
   default = "ec2-user"
+}
+
+variable "number_of_nodes" {
+  description = "The number of nodes in the load balancer"
+  type        = number
+  default     = 2
 }
